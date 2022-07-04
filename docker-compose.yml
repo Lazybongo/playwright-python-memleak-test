@@ -1,0 +1,38 @@
+version: '2'
+services:
+  python-playwright-mem:
+    image: python:3.9
+    volumes:
+      - .:/var/www/app
+    depends_on:
+      - browserless-chrome
+    command: /var/www/app/docker-run.sh
+
+  browserless-chrome:
+    hostname: browserless-chrome
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    image: browserless/chrome
+    environment:
+      # For the test file
+      - ALLOW_FILE_PROTOCOL=true
+      - ENABLE_DEBUGGER=false
+      - VNC_NO_PASSWORD=1
+      - SCREEN_WIDTH=1280
+      - SCREEN_HEIGHT=1024
+      - SCREEN_DEPTH=16
+      - PREBOOT_CHROME=true
+      - CONNECTION_TIMEOUT=300000
+      - MAX_CONCURRENT_SESSIONS=10
+      - JAVA_OPTS=-Dwebdriver.chrome.whitelistedIps=
+      - CHROME_REFRESH_TIME=600000
+      - DEFAULT_BLOCK_ADS=true
+      - DEFAULT_STEALTH=true
+    volumes:
+      # Workaround to avoid the browser crashing inside a docker container
+      # See https://github.com/SeleniumHQ/docker-selenium#quick-start
+      - /dev/shm:/dev/shm
+      - .:/var/www/app
+
